@@ -1,10 +1,10 @@
 # linkedList.o
 A simple linked list implementation
 
-## to install run 
+## How to install
     make rel
     ./tests
     make install
 
-## to remove run
+## How to remove run
     make uninstall
