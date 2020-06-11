@@ -6,5 +6,5 @@ A simple linked list implementation
     ./tests
     make install
 
-## How to remove run
+## How to remove
     make uninstall
