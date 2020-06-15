@@ -18,13 +18,13 @@ void test_node_new() {
     node_free(node);
 }
 
-void test_ll_push() {
+void test_ll_append() {
     LinkedList ll = {0,0};
     /* mallocs a new node on the head */
-    ll_push(&ll, (void*)42);
+    ll_append(&ll, (void*)42);
     assert(ll.len == 1);
     /* mallocs on the first node */
-    ll_push(&ll, (void*)24);
+    ll_append(&ll, (void*)24);
     assert(ll.len == 2);
     /* cleanup (its still dirty, I
      * just want to prevent a mem leak */
@@ -37,8 +37,8 @@ void test_ll_remove_last() {
     /* make sure that it fails if ll is empty */
     assert(ll_remove_last(&ll) == 0);
     /* free second item */
-    ll_push(&ll, (void*)24);
-    ll_push(&ll, (void*)42);
+    ll_append(&ll, (void*)24);
+    ll_append(&ll, (void*)42);
     assert(ll_remove_last(&ll) == 1);
     assert(ll.len == 1);
     assert(ll.head != 0);
@@ -52,9 +52,9 @@ void test_ll_free_nodes() {
     LinkedList ll = {0,0};
     /* fails on empty linked list */
     assert(ll_free_nodes(&ll) == 0);
-    ll_push(&ll, (void*)42);
-    ll_push(&ll, (void*)42);
-    ll_push(&ll, (void*)42);
+    ll_append(&ll, (void*)42);
+    ll_append(&ll, (void*)42);
+    ll_append(&ll, (void*)42);
     assert(ll.len == 3);
     assert(ll_free_nodes(&ll) == 1);
     assert(ll.len == 0);
@@ -63,7 +63,7 @@ void test_ll_free_nodes() {
 void test_ll_seek() {
     LinkedList ll = {0, 0};
     assert(ll_seek(&ll, 0) == 0);
-    ll_push(&ll, (void*)42);
+    ll_append(&ll, (void*)42);
     assert(ll_seek(&ll, 0)->value == (void*)42);
     ll_remove_last(&ll);
 }
@@ -71,7 +71,7 @@ void test_ll_seek() {
 void test_ll_get() {
     LinkedList ll = {0, 0};
     assert(ll_seek(&ll, 0) == 0);
-    ll_push(&ll, (void*)42);
+    ll_append(&ll, (void*)42);
     assert(ll_get(&ll, 0) == (void*)42);
     ll_remove_last(&ll);
 }
@@ -81,17 +81,17 @@ void test_ll_remove_at() {
     /* fail on index > ll.len */
     assert(ll_remove_at(&ll, 0) == 0);
     /* remove last */
-    ll_push(&ll, (void*)42);
+    ll_append(&ll, (void*)42);
     assert(ll_remove_at(&ll, 0) == 1);
     assert(ll.len == 0);
     /* remove head */
-    ll_push(&ll, (void*)42);
-    ll_push(&ll, (void*)64);
+    ll_append(&ll, (void*)42);
+    ll_append(&ll, (void*)64);
     assert(ll_remove_at(&ll, 0) == 1);
     assert(ll.head->value == (void*)64);
     /* remove somthing in the middle */
-    ll_push(&ll, (void*)42);
-    ll_push(&ll, (void*)24);
+    ll_append(&ll, (void*)42);
+    ll_append(&ll, (void*)24);
     assert(ll_remove_at(&ll, 1) == 1);
     assert(ll.head->children[1]->value == (void*)24);
     ll_remove_last(&ll);
@@ -100,7 +100,7 @@ void test_ll_remove_at() {
 
 void test_ll_pop() {
     LinkedList ll = {0, 0};
-    ll_push(&ll, (void*)42);
+    ll_append(&ll, (void*)42);
     assert(ll_pop(&ll) == (void*)42);
     assert(ll.len == 0);
 }
@@ -111,8 +111,8 @@ int main() {
     test_node_new();
     puts("[OK]");
 
-    puts("testing ll_push");
-    test_ll_push();
+    puts("testing ll_append");
+    test_ll_append();
     puts("[OK]");
 
     puts("testing ll_remove_last");

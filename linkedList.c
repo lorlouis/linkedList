@@ -35,7 +35,7 @@ void _node_debug_print(Node* node) {
 
 /* allocates memory on ll_node and ll_node.children
  * (ll_node.children is initialised to a bunch of zeros */
-void ll_push(LinkedList* ll, void* value) {
+void ll_append(LinkedList* ll, void* value) {
     Node *ll_node = node_new(value, 2);
     /* check if we push to the head */
     if(!ll->len) {

@@ -24,8 +24,8 @@ typedef struct LinkedLists {
 
 #define ll_len(x) (*x.len)
 
-/* push an element at the first position in the list */
-void ll_push(LinkedList*, void*);
+/* append an element at the end of the list */
+void ll_append(LinkedList*, void*);
 
 /* retuns the item stored in the list at index */
 void* ll_get(LinkedList*, unsigned int);
@@ -42,6 +42,6 @@ Node* ll_seek(LinkedList*, unsigned int);
 /* removes at index, returns 1 if error */
 int ll_remove_at(LinkedList*, unsigned int);
 
-/* removes first and returns it */
+/* removes last and returns it */
 void* ll_pop(LinkedList* ll);
 #endif
