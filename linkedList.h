@@ -15,7 +15,7 @@ Node* node_new(void*, unsigned int);
 void node_free(Node*);
 
 /* prints the node in debug mode */
-void _node_debug_print(Node* node);
+void _node_debug_print(Node*);
 
 typedef struct LinkedLists {
     struct Node_s *head;
@@ -26,6 +26,9 @@ typedef struct LinkedLists {
 
 /* append an element at the end of the list */
 void ll_append(LinkedList*, void*);
+
+/* insert at a specific index */
+int ll_insert(LinkedList*, unsigned int, void*);
 
 /* retuns the item stored in the list at index */
 void* ll_get(LinkedList*, unsigned int);

@@ -76,6 +76,24 @@ void test_ll_get() {
     ll_remove_last(&ll);
 }
 
+void test_ll_insert() {
+    LinkedList ll = {0, 0};
+    ll_append(&ll,(void*)12);
+    ll_append(&ll,(void*)21);
+    ll_append(&ll,(void*)44);
+    assert(ll_insert(&ll, 0, (void*)42) == 1);
+    assert(ll.len == 4);
+    assert(ll_get(&ll, 0) == (void*)42);
+    assert(ll_get(&ll, 1) == (void*)12);
+    assert(ll_insert(&ll, 2, (void*)88) == 1);
+    assert(ll_insert(&ll, 50, 0) == 0);
+    assert(ll_get(&ll, 2) == (void*)88);
+    assert(ll_get(&ll, 1) == (void*)12);
+    assert(ll_insert(&ll, 5, 0) == 1);
+    assert(ll_get(&ll, 5) == 0);
+    ll_free_nodes(&ll);
+}
+
 void test_ll_remove_at() {
     LinkedList ll = {0, 0};
     /* fail on index > ll.len */
@@ -125,6 +143,10 @@ int main() {
 
     puts("testing ll_get");
     test_ll_get();
+    puts("[OK]");
+
+    puts("testing ll_insert");
+    test_ll_insert();
     puts("[OK]");
 
     puts("testing ll_remove_at");

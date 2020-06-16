@@ -40,17 +40,17 @@ void ll_append(LinkedList* ll, void* value) {
     /* check if we push to the head */
     if(!ll->len) {
         ll->head = ll_node;
-        ll->len += 1;
+        ll->len++;
         return;
     }
     int i;
     Node *current = ll->head;
-    for(i=1;i<ll->len;i++)
+    for(i=0;i<ll->len-1;i++)
         current = current->children[1];
 
     ll_node->children[0] = current;
     current->children[1] = ll_node;
-    ll->len += 1;
+    ll->len++;
 }
 
 /* TODO rework to remove edge cases */
@@ -98,8 +98,10 @@ int ll_remove_at(LinkedList* ll, unsigned int index) {
     /* remove head */
     if(index == 0) {
         tmp = ll->head;
-        if(ll->head->children[1])
+        if(ll->head->children[1]) {
             ll->head = ll->head->children[1];
+            ll->head->children[0] = 0;
+        }
         node_free(tmp);
         ll->len--;
         return 1;
@@ -112,6 +114,7 @@ int ll_remove_at(LinkedList* ll, unsigned int index) {
      * this changes the next node of the previous node
      * to be the next node of tmp */
     tmp->children[0]->children[1] = tmp->children[1];
+    tmp->children[1]->children[0] = tmp->children[0];
     ll->len--;
     node_free(tmp);
     return 1;
@@ -120,6 +123,36 @@ int ll_remove_at(LinkedList* ll, unsigned int index) {
 void* ll_get(LinkedList* ll, unsigned int index) {
     Node* ll_node = ll_seek(ll, index);
     return ll_node->value;
+}
+
+int ll_insert(LinkedList* ll, unsigned int index, void* value) {
+    /* check if we append */
+    if(index == ll->len) {
+        ll_append(ll, value);
+        return 1;
+    }
+    /* you cannot insert to an unreachable index */
+    if(index > ll->len)
+        return 0;
+
+    Node *ll_node = node_new(value, 2);
+    /* if we insert on the head */
+    if(!index) {
+        ll_node->children[1] = ll->head;
+        ll->head->children[0] = ll_node;
+        ll->head = ll_node;
+        ll->len++;
+        return 1;
+    }
+    Node *current = ll_seek(ll, index);
+    ll_node->children[0] = current->children[0];
+
+    current->children[0]->children[1] = ll_node;
+
+    ll_node->children[1] = current;
+    current->children[0] = ll_node;
+    ll->len++;
+    return 1;
 }
 
 void* ll_pop(LinkedList* ll) {

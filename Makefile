@@ -2,18 +2,18 @@ OBJS	= tests.o linkedList.o
 SOURCE	= tests.c linkedList.c
 HEADER	= linkedList.h
 OUT	= tests
-CC	= gcc
+CC	= gcc -g
 FLAGS    = -std=c89 -c -Wall
 LFLAGS	 =
+
+debug: $(OBJS)
+	$(CC) $(OBJS) -o $(OUT) $(LFLAGS)
 
 linkedList.o: linkedList.c
 	$(CC) $(FLAGS) linkedList.c
 
 rel: $(OBJS)
 	$(CC) -O3 $(OBJS) -o $(OUT) $(LFLAGS)
-
-debug: $(OBJS)
-	$(CC) -g3 $(OBJS) -o $(OUT) $(LFLAGS)
 
 main.o: main.c
 	$(CC) $(FLAGS) main.c 
@@ -28,9 +28,6 @@ uninstall:
 
 clean:
 	rm -f $(OBJS) $(OUT)
-
-debug: $(OUT)
-	valgrind $(OUT)
 
 valgrind: $(OUT)
 	valgrind $(OUT)
