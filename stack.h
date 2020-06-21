@@ -5,7 +5,7 @@
 
 #define Stack LinkedList
 
-int stk_push(Stack*, void*);
+int stk_push(Stack*, void*, int*);
 
 void* stk_pop(Stack*, int*);
 #endif

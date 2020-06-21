@@ -9,7 +9,7 @@ typedef struct Node_s {
     struct Node_s **children;
 } Node;
 /* creates a new Node */
-Node* node_new(void*, unsigned int);
+Node* node_new(void* , unsigned int , int *);
 
 /* frees the node and its children array */
 void node_free(Node*);

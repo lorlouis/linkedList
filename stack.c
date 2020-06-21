@@ -6,10 +6,13 @@
 /* Stack is a macro equivalent to LinkedList */
 
 /* pushes the value on the head of the linked list */
-int stk_push(Stack* stk, void* value) {
+int stk_push(Stack* stk, void* value, int *err) {
+    *err = 0;
     /* 2 children because I want ll_*
      * methods to work on stacks*/
-    Node* node = node_new(value, 2);
+    Node* node = node_new(value, 2, err);
+    if(*err) return -1;
+
     if(stk->head) {
         node->children[1] = stk->head;
     }

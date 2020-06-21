@@ -10,14 +10,17 @@
  * */
 
 /* allocates memory on ll_node and ll_node.children
- * (ll_node.children is initialised to a bunch of zeros */
-void ll_append(LinkedList* ll, void* value) {
-    Node *ll_node = node_new(value, 2);
+ * (ll_node.children is initialised to a bunch of zeros)
+ * on fail it returns -1 and sets *err to and errno */
+int ll_append(LinkedList* ll, void* value, int *err) {
+    /* node_new sets *err to 0 before using it */
+    Node *ll_node = node_new(value, 2, err);
+    if(*err) return -1;
     /* check if we push to the head */
     if(!ll->len) {
         ll->head = ll_node;
         ll->len++;
-        return;
+        return 0;
     }
     int i;
     Node *current = ll->head;
@@ -27,12 +30,17 @@ void ll_append(LinkedList* ll, void* value) {
     ll_node->children[0] = current;
     current->children[1] = ll_node;
     ll->len++;
+    return 0;
 }
 
-/* TODO rework to remove edge cases */
-int ll_remove_last(LinkedList* ll) {
-    if(!ll || ll->len == 0 || !ll->head)
+/* removes the last element in the linked list
+ * on fail, it returns -1 and sets *err to and errno */
+int ll_remove_last(LinkedList* ll, int* err) {
+    *err = 0;
+    if(!ll || ll->len == 0 || !ll->head) {
+        *err = 29;  /* Illegal seek */
         return -1;
+    }
 
     ll->len--;
     if(ll->len == 0) {
@@ -50,10 +58,14 @@ int ll_remove_last(LinkedList* ll) {
     return 0;
 }
 
-int ll_free_nodes(LinkedList *ll) {
-    if(!ll || ll->len == 0 || !ll->head)
+int ll_free_nodes(LinkedList *ll, int *err) {
+    *err = 0;
+    if(!ll || ll->len == 0 || !ll->head) {
+        *err = 29;  /* Illegal seek */
         return -1;
-    while(ll_remove_last(ll) == 0);
+    }
+    /* on error remove_last will set err to Illegal seek */
+    while(ll_remove_last(ll, err) == 0);
     return ll->len ? -1 : 0;
 }
 
@@ -72,9 +84,13 @@ Node* ll_seek(LinkedList* ll, unsigned int index, int *err) {
     return ll_node;
 }
 
-int ll_remove_at(LinkedList* ll, unsigned int index) {
-    if(index >= ll->len) return -1;
-    if(index == ll->len-1) return ll_remove_last(ll);
+int ll_remove_at(LinkedList* ll, unsigned int index, int *err) {
+    *err = 0;
+    if(index >= ll->len){
+        *err = 29;  /* Illegal seek */
+        return -1;
+    }
+    if(index == ll->len-1) return ll_remove_last(ll, err);
     Node *tmp;
     
     /* remove head */
@@ -89,9 +105,8 @@ int ll_remove_at(LinkedList* ll, unsigned int index) {
         return 0;
     }
     /* remove any other index */
-    int err = 0;
-    tmp = ll_seek(ll, index, &err);
-    if(err) return -1;
+    tmp = ll_seek(ll, index, err);
+    if(*err) return -1;
 
     /* children[0] = previous node
      * children[1] = next node
@@ -113,17 +128,21 @@ void* ll_get(LinkedList* ll, unsigned int index, int* err) {
     return ll_node->value;
 }
 
-int ll_insert(LinkedList* ll, unsigned int index, void* value) {
+int ll_insert(LinkedList* ll, unsigned int index, void* value, int *err) {
+    *err = 0;
     /* check if we append */
     if(index == ll->len) {
-        ll_append(ll, value);
+        ll_append(ll, value, err);
         return 0;
     }
     /* you cannot insert to an unreachable index */
-    if(index > ll->len)
+    if(index > ll->len) {
+        *err = 29;  /* Illegal seek */
         return -1;
+    }
 
-    Node *ll_node = node_new(value, 2);
+    Node *ll_node = node_new(value, 2, err);
+    if(*err) return -1;
     /* if we insert on the head */
     if(!index) {
         ll_node->children[1] = ll->head;
@@ -132,8 +151,7 @@ int ll_insert(LinkedList* ll, unsigned int index, void* value) {
         ll->len++;
         return 0;
     }
-    int err;
-    Node *current = ll_seek(ll, index, &err);
+    Node *current = ll_seek(ll, index, err);
     ll_node->children[0] = current->children[0];
 
     current->children[0]->children[1] = ll_node;
@@ -148,7 +166,7 @@ int ll_insert(LinkedList* ll, unsigned int index, void* value) {
  * returns NULL if it fails */
 void* ll_pop(LinkedList* ll, int *err) {
     void *val = ll_get(ll, ll->len - 1, err);
-    if(ll_remove_last(ll) == -1){
+    if(ll_remove_last(ll, err) == -1){
         *err = 29;  /* illegal seek */
         return 0;
     }

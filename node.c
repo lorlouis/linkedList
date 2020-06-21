@@ -6,12 +6,19 @@
 #endif
 
 /* allocates memory for node and node.children
- * and initialises node.children to zeros */
-Node* node_new(void* value, unsigned int nb_children) {
-    if(nb_children > MAX_NB_CHILDREN)
+ * and initialises node.children to zeros
+ * on fail, returns 0 and sets *err to an errno */
+Node* node_new(void* value, unsigned int nb_children, int *err) {
+    *err = 0;
+    if(nb_children > MAX_NB_CHILDREN){
+        *err = 29;  /* Illegal seek */
         return 0;
-
+    }
     Node *local_node = malloc(sizeof(Node));
+    if(!local_node){
+        *err = 12; /* Cannot allocate memory */
+        return 0;
+    }
     local_node->value = value;
     local_node->nb_children = nb_children;
     local_node->children = calloc(nb_children, sizeof(Node*));
