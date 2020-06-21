@@ -1,21 +1,7 @@
 #ifndef LINKED_LIST_H
 #define LINKED_LIST_H
 
-#define MAX_NB_CHILDREN 4096
-
-typedef struct Node_s {
-    void* value;
-    int nb_children;
-    struct Node_s **children;
-} Node;
-/* creates a new Node */
-Node* node_new(void*, unsigned int);
-
-/* frees the node and its children array */
-void node_free(Node*);
-
-/* prints the node in debug mode */
-void _node_debug_print(Node*);
+#include "node.h"
 
 typedef struct LinkedLists {
     struct Node_s *head;
@@ -30,8 +16,9 @@ void ll_append(LinkedList*, void*);
 /* insert at a specific index */
 int ll_insert(LinkedList*, unsigned int, void*);
 
-/* retuns the item stored in the list at index */
-void* ll_get(LinkedList*, unsigned int);
+/* retuns the item stored in the list at index
+ * on error returns NULL and sets *err to an errno */
+void* ll_get(LinkedList*, unsigned int, int*);
 
 /* self explanatory... */
 int ll_remove_last(LinkedList*);
@@ -40,11 +27,12 @@ int ll_remove_last(LinkedList*);
 int ll_free_nodes(LinkedList*);
 
 /* gets a pointer to the node at index n or 0 */
-Node* ll_seek(LinkedList*, unsigned int);
+Node* ll_seek(LinkedList* , unsigned int , int *);
 
 /* removes at index, returns 1 if error */
 int ll_remove_at(LinkedList*, unsigned int);
 
-/* removes last and returns it */
-void* ll_pop(LinkedList* ll);
+/* removes last and returns it
+ * on error returns NULL and sets *err to and errno */
+void* ll_pop(LinkedList* , int *);
 #endif

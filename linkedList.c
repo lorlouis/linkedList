@@ -1,37 +1,13 @@
 #include <stdlib.h>
+#ifdef _DEBUG_
 #include <stdio.h>
+#endif
+#include "node.h"
 #include "linkedList.h"
 
-/* allocates memory for node and node.children
- * and initialises node.children to zeros */
-Node* node_new(void* value, unsigned int nb_children) {
-    if(nb_children > MAX_NB_CHILDREN)
-        return 0;
-
-    Node *local_node = malloc(sizeof(Node));
-    local_node->value = value;
-    local_node->nb_children = nb_children;
-    local_node->children = calloc(nb_children, sizeof(Node*));
-    return local_node;
-}
-
-void node_free(Node* node) {
-    free(node->children);
-    free(node);
-}
-
-void _node_debug_print(Node* node) {
-    if(node == 0) {
-        printf("Null ptr\n");
-        return;
-    }
-    printf("addr: %p\n", node);
-    printf("val: %p\n", node->value);
-    printf("children [");
-    Node* p;
-    while((p = *(node->children))) printf("  %p,\n", p);
-    puts("]");
-}
+/* 
+ * TODO use errno in this lib
+ * */
 
 /* allocates memory on ll_node and ll_node.children
  * (ll_node.children is initialised to a bunch of zeros */
@@ -56,12 +32,12 @@ void ll_append(LinkedList* ll, void* value) {
 /* TODO rework to remove edge cases */
 int ll_remove_last(LinkedList* ll) {
     if(!ll || ll->len == 0 || !ll->head)
-        return 0;
+        return -1;
 
     ll->len--;
     if(ll->len == 0) {
         node_free(ll->head);
-        return 1;
+        return 0;
     }
 
     Node *current = ll->head;
@@ -71,27 +47,33 @@ int ll_remove_last(LinkedList* ll) {
     /* remove ref to current in prev Node */
     current->children[0]->children[1] = 0;
     node_free(current);
-    return 1;
+    return 0;
 }
 
 int ll_free_nodes(LinkedList *ll) {
     if(!ll || ll->len == 0 || !ll->head)
-        return 0;
-    while(ll_remove_last(ll));
-    return ll->len == 0;
+        return -1;
+    while(ll_remove_last(ll) == 0);
+    return ll->len ? -1 : 0;
 }
 
-Node* ll_seek(LinkedList* ll, unsigned int index) {
+/* returns a pointer to the node,
+ * returns NULL if the seek fails
+ * and writes an errno to *err */
+Node* ll_seek(LinkedList* ll, unsigned int index, int *err) {
+    *err = 0;
     /* out of bound */
-    if(index >= ll->len) return 0;
-
+    if(index >= ll->len){
+        *err = 29;  /* illegal seek */
+        return NULL;
+    }
     Node *ll_node = ll->head;
     while(index--) ll_node = ll_node->children[1];
     return ll_node;
 }
 
 int ll_remove_at(LinkedList* ll, unsigned int index) {
-    if(index >= ll->len) return 0;
+    if(index >= ll->len) return -1;
     if(index == ll->len-1) return ll_remove_last(ll);
     Node *tmp;
     
@@ -104,10 +86,12 @@ int ll_remove_at(LinkedList* ll, unsigned int index) {
         }
         node_free(tmp);
         ll->len--;
-        return 1;
+        return 0;
     }
     /* remove any other index */
-    tmp = ll_seek(ll, index);
+    int err = 0;
+    tmp = ll_seek(ll, index, &err);
+    if(err) return -1;
 
     /* children[0] = previous node
      * children[1] = next node
@@ -117,11 +101,15 @@ int ll_remove_at(LinkedList* ll, unsigned int index) {
     tmp->children[1]->children[0] = tmp->children[0];
     ll->len--;
     node_free(tmp);
-    return 1;
+    return 0;
 }
 
-void* ll_get(LinkedList* ll, unsigned int index) {
-    Node* ll_node = ll_seek(ll, index);
+/* returns the value stored at index in the linked list
+ * on fail it returns NULL and write an errno to *err */
+void* ll_get(LinkedList* ll, unsigned int index, int* err) {
+    /* ll_seek sets *err to 0, no use to set it here */
+    Node* ll_node = ll_seek(ll, index, err);
+    if(*err) return 0;
     return ll_node->value;
 }
 
@@ -129,11 +117,11 @@ int ll_insert(LinkedList* ll, unsigned int index, void* value) {
     /* check if we append */
     if(index == ll->len) {
         ll_append(ll, value);
-        return 1;
+        return 0;
     }
     /* you cannot insert to an unreachable index */
     if(index > ll->len)
-        return 0;
+        return -1;
 
     Node *ll_node = node_new(value, 2);
     /* if we insert on the head */
@@ -142,9 +130,10 @@ int ll_insert(LinkedList* ll, unsigned int index, void* value) {
         ll->head->children[0] = ll_node;
         ll->head = ll_node;
         ll->len++;
-        return 1;
+        return 0;
     }
-    Node *current = ll_seek(ll, index);
+    int err;
+    Node *current = ll_seek(ll, index, &err);
     ll_node->children[0] = current->children[0];
 
     current->children[0]->children[1] = ll_node;
@@ -152,15 +141,20 @@ int ll_insert(LinkedList* ll, unsigned int index, void* value) {
     ll_node->children[1] = current;
     current->children[0] = ll_node;
     ll->len++;
-    return 1;
+    return 0;
 }
-
-void* ll_pop(LinkedList* ll) {
-    void *val = ll_get(ll, ll->len - 1);
-    ll_remove_last(ll);
+/* removes and returns the value of the last
+ * element in the list
+ * returns NULL if it fails */
+void* ll_pop(LinkedList* ll, int *err) {
+    void *val = ll_get(ll, ll->len - 1, err);
+    if(ll_remove_last(ll) == -1){
+        *err = 29;  /* illegal seek */
+        return 0;
+    }
     return val;
 }
-
+#ifdef _DEBUG_
 void _ll_debug_print(LinkedList* ll) {
     printf("len: %d\n[", ll->len);
     Node* cur = ll->head;
@@ -170,3 +164,4 @@ void _ll_debug_print(LinkedList* ll) {
     }
     printf("]\n");
 }
+#endif

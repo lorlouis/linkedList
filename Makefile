@@ -1,6 +1,6 @@
-OBJS	= tests.o linkedList.o
-SOURCE	= tests.c linkedList.c
-HEADER	= linkedList.h
+OBJS	= tests.o linkedList.o node.o stack.o
+SOURCE	= tests.c linkedList.c node.c stack.c
+HEADER	= linkedList.h node.h
 OUT	= tests
 CC	= gcc -g
 FLAGS    = -std=c89 -c -Wall
@@ -14,9 +14,6 @@ linkedList.o: linkedList.c
 
 rel: $(OBJS)
 	$(CC) -O3 $(OBJS) -o $(OUT) $(LFLAGS)
-
-main.o: main.c
-	$(CC) $(FLAGS) main.c 
 
 install: linkedList.o
 	cp linkedList.o /usr/local/lib/

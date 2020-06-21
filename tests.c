@@ -2,7 +2,9 @@
 #include <assert.h>
 #include <stdlib.h>
 #include <stdint.h>
+
 #include "linkedList.h"
+#include "stack.h"
 
 /* Node tests */
 void test_node_new() {
@@ -35,94 +37,122 @@ void test_ll_append() {
 void test_ll_remove_last() {
     LinkedList ll = {0,0};
     /* make sure that it fails if ll is empty */
-    assert(ll_remove_last(&ll) == 0);
+    assert(ll_remove_last(&ll) == -1);
     /* free second item */
     ll_append(&ll, (void*)24);
     ll_append(&ll, (void*)42);
-    assert(ll_remove_last(&ll) == 1);
+    assert(ll_remove_last(&ll) == 0);
     assert(ll.len == 1);
     assert(ll.head != 0);
     assert(ll.head->children[1] == 0);
     /* free head */
-    assert(ll_remove_last(&ll) == 1);
+    assert(ll_remove_last(&ll) == 0);
     /* _ll_debug_print(&ll); */
 }
 
 void test_ll_free_nodes() {
     LinkedList ll = {0,0};
     /* fails on empty linked list */
-    assert(ll_free_nodes(&ll) == 0);
+    assert(ll_free_nodes(&ll) == -1);
     ll_append(&ll, (void*)42);
     ll_append(&ll, (void*)42);
     ll_append(&ll, (void*)42);
     assert(ll.len == 3);
-    assert(ll_free_nodes(&ll) == 1);
+    assert(ll_free_nodes(&ll) == 0);
     assert(ll.len == 0);
 }
 
 void test_ll_seek() {
+    int err;
     LinkedList ll = {0, 0};
-    assert(ll_seek(&ll, 0) == 0);
+    assert(ll_seek(&ll, 0, &err) == NULL);
     ll_append(&ll, (void*)42);
-    assert(ll_seek(&ll, 0)->value == (void*)42);
+    assert(ll_seek(&ll, 0, &err)->value == (void*)42);
     ll_remove_last(&ll);
 }
 
 void test_ll_get() {
+    int err;
     LinkedList ll = {0, 0};
-    assert(ll_seek(&ll, 0) == 0);
+    assert(ll_get(&ll, 0, &err) == NULL);
+    assert(err == 29);  /* make sure was set */
     ll_append(&ll, (void*)42);
-    assert(ll_get(&ll, 0) == (void*)42);
+    assert(ll_get(&ll, 0, &err) == (void*)42);
     ll_remove_last(&ll);
 }
 
 void test_ll_insert() {
+    int err;
     LinkedList ll = {0, 0};
     ll_append(&ll,(void*)12);
     ll_append(&ll,(void*)21);
     ll_append(&ll,(void*)44);
-    assert(ll_insert(&ll, 0, (void*)42) == 1);
+    assert(ll_insert(&ll, 0, (void*)42) == 0);
     assert(ll.len == 4);
-    assert(ll_get(&ll, 0) == (void*)42);
-    assert(ll_get(&ll, 1) == (void*)12);
-    assert(ll_insert(&ll, 2, (void*)88) == 1);
-    assert(ll_insert(&ll, 50, 0) == 0);
-    assert(ll_get(&ll, 2) == (void*)88);
-    assert(ll_get(&ll, 1) == (void*)12);
-    assert(ll_insert(&ll, 5, 0) == 1);
-    assert(ll_get(&ll, 5) == 0);
+    /* test insert stuff */
+    assert(ll_get(&ll, 0, &err) == (void*)42);
+    assert(ll_get(&ll, 1, &err) == (void*)12);
+    assert(ll_insert(&ll, 2, (void*)88) == 0);
+    /* test insert at unreachable index */
+    assert(ll_insert(&ll, 50, 0) == -1);
+    /* make sure we didn't insert something anyway */
+    assert(ll_get(&ll, 2, &err) == (void*)88);
+    assert(ll_get(&ll, 1, &err) == (void*)12);
+    /* test insert on head */
+    assert(ll_insert(&ll, 5, 0) == 0);
+    assert(ll_get(&ll, 5, &err) == 0);
     ll_free_nodes(&ll);
 }
 
 void test_ll_remove_at() {
     LinkedList ll = {0, 0};
     /* fail on index > ll.len */
-    assert(ll_remove_at(&ll, 0) == 0);
+    assert(ll_remove_at(&ll, 0) == -1);
     /* remove last */
     ll_append(&ll, (void*)42);
-    assert(ll_remove_at(&ll, 0) == 1);
+    assert(ll_remove_at(&ll, 0) == 0);
     assert(ll.len == 0);
     /* remove head */
     ll_append(&ll, (void*)42);
     ll_append(&ll, (void*)64);
-    assert(ll_remove_at(&ll, 0) == 1);
+    assert(ll_remove_at(&ll, 0) == 0);
     assert(ll.head->value == (void*)64);
     /* remove somthing in the middle */
     ll_append(&ll, (void*)42);
     ll_append(&ll, (void*)24);
-    assert(ll_remove_at(&ll, 1) == 1);
+    assert(ll_remove_at(&ll, 1) == 0);
     assert(ll.head->children[1]->value == (void*)24);
     ll_remove_last(&ll);
     ll_remove_last(&ll);
 }
 
 void test_ll_pop() {
+    int err;
     LinkedList ll = {0, 0};
     ll_append(&ll, (void*)42);
-    assert(ll_pop(&ll) == (void*)42);
+    assert(ll_pop(&ll, &err) == (void*)42);
     assert(ll.len == 0);
 }
 
+void test_stk_push() {
+    Stack stk = {0,0};
+    stk_push(&stk, (void*)42);
+    assert(stk.head->value = (void*)42);
+    stk_push(&stk, (void*)24);
+    assert(stk.head->value = (void*)24);
+    assert(stk.head->children[0]->value = (void*)42);
+}
+
+void test_stk_pop() {
+    int err;
+    Stack stk = {0,0};
+    stk_push(&stk, (void*)42);
+    stk_push(&stk, (void*)24);
+    assert(stk_pop(&stk, &err) == (void*)24);
+    assert(err == 0);
+    assert(stk_pop(&stk, &err) == (void*)42);
+    assert(stk.head == 0);
+}
 
 int main() {
     puts("testing node_new");
@@ -159,6 +189,14 @@ int main() {
 
     puts("testing ll_free_nodes");
     test_ll_free_nodes();
+    puts("[OK]");
+
+    puts("testing stk_push");
+    test_stk_push();
+    puts("[OK]");
+
+    puts("testing stk_pop");
+    test_stk_pop();
     puts("[OK]");
 
     return 0;
