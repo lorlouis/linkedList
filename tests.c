@@ -140,7 +140,7 @@ void test_stk_push() {
     assert(stk.head->value = (void*)42);
     stk_push(&stk, (void*)24);
     assert(stk.head->value = (void*)24);
-    assert(stk.head->children[0]->value = (void*)42);
+    assert(stk.head->children[1]->value = (void*)42);
 }
 
 void test_stk_pop() {

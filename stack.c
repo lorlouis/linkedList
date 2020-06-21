@@ -3,14 +3,15 @@
 #include "stack.h"
 
 
-/* Stack is a macro equivalent to LinkedList
- * node.children[0] only references the next node */
+/* Stack is a macro equivalent to LinkedList */
 
 /* pushes the value on the head of the linked list */
 int stk_push(Stack* stk, void* value) {
-    Node* node = node_new(value, 1);
+    /* 2 children because I want ll_*
+     * methods to work on stacks*/
+    Node* node = node_new(value, 2);
     if(stk->head) {
-        node->children[0] = stk->head;
+        node->children[1] = stk->head;
     }
     stk->head = node;
     stk->len++;
@@ -25,7 +26,7 @@ void* stk_pop(Stack* stk, int* err) {
         return 0;
     }
     void* val = stk->head->value;
-    Node* node = stk->head->children[0];
+    Node* node = stk->head->children[1];
     node_free(stk->head);
     stk->head = node;
     return val;
