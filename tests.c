@@ -26,12 +26,13 @@ void test_ll_enqueue() {
     int err;
     LinkedList ll = {0,0};
     ll_enqueue(&ll, (void*)42, &err);
-    assert(ll.head->value = (void*)42);
-    assert(ll.tail->value = (void*)42);
+    assert(ll.head->value == (void*)42);
+    assert(ll.tail->value == (void*)42);
     ll_enqueue(&ll, (void*)24, &err);
-    assert(ll.head->value = (void*)24);
-    assert(ll.tail->value = (void*)42);
-    assert(ll.head->children[1]->value = (void*)42);
+    assert(ll.head->value == (void*)24);
+    assert(ll.tail->value == (void*)42);
+    assert(ll.head->children[1]->value == (void*)42);
+    ll_free_nodes(&ll, &err);
 }
 
 void test_ll_append() {
@@ -91,6 +92,9 @@ void test_ll_seek() {
     assert(ll_seek(&ll, 0, &err) == NULL);
     ll_append(&ll, (void*)42, &err);
     assert(ll_seek(&ll, 0, &err)->value == (void*)42);
+    ll_append(&ll, (void*)24, &err);
+    assert(ll_seek(&ll, 1, &err)->value == (void*)24);
+    ll_remove_last(&ll, &err);
     ll_remove_last(&ll, &err);
 }
 
@@ -147,8 +151,7 @@ void test_ll_remove_at() {
     ll_append(&ll, (void*)24, &err);
     assert(ll_remove_at(&ll, 1, &err) == 0);
     assert(ll.head->children[1]->value == (void*)24);
-    ll_remove_last(&ll, &err);
-    ll_remove_last(&ll, &err);
+    ll_free_nodes(&ll, &err);
 }
 
 void test_ll_pop() {
@@ -165,10 +168,12 @@ void test_stk_push() {
     int err;
     Stack stk = {0,0};
     stk_push(&stk, (void*)42, &err);
-    assert(stk.head->value = (void*)42);
+    assert(stk.head->value == (void*)42);
     stk_push(&stk, (void*)24, &err);
-    assert(stk.head->value = (void*)24);
-    assert(stk.head->children[1]->value = (void*)42);
+    assert(stk.head->value == (void*)24);
+    assert(stk.head->children[1]->value == (void*)42);
+    assert(ll_free_nodes(&stk, &err) == 0);
+    assert(stk.len == 0);
 }
 
 void test_stk_pop() {
@@ -186,10 +191,12 @@ void test_q_enqueue() {
     int err;
     Queue q = {0,0};
     q_enqueue(&q, (void*)42, &err);
-    assert(q.head->value = (void*)42);
+    assert(q.head->value == (void*)42);
     q_enqueue(&q, (void*)24, &err);
-    assert(q.head->value = (void*)24);
-    assert(q.head->children[1]->value = (void*)42);
+    assert(q.head->value == (void*)24);
+    assert(q.head->children[1]->value == (void*)42);
+    assert(ll_free_nodes(&q, &err) == 0);
+    assert(q.len == 0);
 }
 
 void test_q_dequeue() {
@@ -200,7 +207,7 @@ void test_q_dequeue() {
     assert(q.len == 0);
     assert(q.head == 0);
     assert(q.tail == 0);
-    /* assert(q_dequeue(&q, &err) == (void*)-1); */
+    assert(q_dequeue(&q, &err) == 0);
 }
 
 int main() {

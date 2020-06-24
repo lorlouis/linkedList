@@ -38,6 +38,7 @@ int ll_enqueue(LinkedList *ll, void* value, int *err) {
     if(*err) return -1;
 
     if(ll->head) {
+        ll->head->children[0] = node;
         node->children[1] = ll->head;
     }
     if(!ll->len) ll->tail = node;
@@ -160,6 +161,7 @@ int ll_remove_at(LinkedList* ll, unsigned int index, int *err) {
         }
         node_free(tmp);
         ll->len--;
+        if(!ll->len) ll->tail = 0;
         return 0;
     }
     /* remove any other index */
@@ -191,10 +193,9 @@ void* ll_get(LinkedList* ll, unsigned int index, int* err) {
  * returns NULL if it fails */
 void* ll_pop(LinkedList* ll, int *err) {
     void *val = ll_get(ll, ll->len - 1, err);
-    if(ll_remove_last(ll, err) == -1){
-        *err = 29;  /* illegal seek */
-        return 0;
-    }
+    if(*err) return 0;
+    ll_remove_last(ll, err);
+    if(*err) return 0;
     return val;
 }
 #ifdef _DEBUG_

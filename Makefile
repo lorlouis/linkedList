@@ -1,6 +1,6 @@
 OBJS	= tests.o linkedList.o node.o stack.o
 SOURCE	= tests.c linkedList.c node.c stack.c
-HEADER	= linkedList.h node.h
+HEADER	= linkedList.h node.h stack.h queue.h
 OUT	= tests
 CC	= gcc -g
 FLAGS    = -std=c89 -c -Wall
