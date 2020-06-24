@@ -5,6 +5,7 @@
 
 #include "linkedList.h"
 #include "stack.h"
+#include "queue.h"
 
 /* Node tests */
 void test_node_new() {
@@ -21,15 +22,30 @@ void test_node_new() {
     node_free(node);
 }
 
+void test_ll_enqueue() {
+    int err;
+    LinkedList ll = {0,0};
+    ll_enqueue(&ll, (void*)42, &err);
+    assert(ll.head->value = (void*)42);
+    assert(ll.tail->value = (void*)42);
+    ll_enqueue(&ll, (void*)24, &err);
+    assert(ll.head->value = (void*)24);
+    assert(ll.tail->value = (void*)42);
+    assert(ll.head->children[1]->value = (void*)42);
+}
+
 void test_ll_append() {
     int err;
     LinkedList ll = {0,0};
     /* mallocs a new node on the head */
     ll_append(&ll, (void*)42, &err);
     assert(ll.len == 1);
+    assert(ll.head->value == (void*)42);
+    assert(ll.tail->value == (void*)42);
     /* mallocs on the first node */
     ll_append(&ll, (void*)24, &err);
     assert(ll.len == 2);
+    assert(ll.tail->value == (void*)24);
     /* cleanup (its still dirty, I
      * just want to prevent a mem leak */
     node_free(ll.head->children[1]);
@@ -45,11 +61,14 @@ void test_ll_remove_last() {
     ll_append(&ll, (void*)24, &err);
     ll_append(&ll, (void*)42, &err);
     assert(ll_remove_last(&ll, &err) == 0);
+    assert(ll.tail->value == (void*)24);
     assert(ll.len == 1);
     assert(ll.head != 0);
     assert(ll.head->children[1] == 0);
+    assert(ll.tail == ll.head);
     /* free head */
     assert(ll_remove_last(&ll, &err) == 0);
+    assert(ll.tail == 0);
     /* _ll_debug_print(&ll); */
 }
 
@@ -117,6 +136,7 @@ void test_ll_remove_at() {
     ll_append(&ll, (void*)42, &err);
     assert(ll_remove_at(&ll, 0, &err) == 0);
     assert(ll.len == 0);
+    assert(ll.tail == 0);
     /* remove head */
     ll_append(&ll, (void*)42, &err);
     ll_append(&ll, (void*)64, &err);
@@ -137,6 +157,8 @@ void test_ll_pop() {
     ll_append(&ll, (void*)42, &err);
     assert(ll_pop(&ll, &err) == (void*)42);
     assert(ll.len == 0);
+    assert(ll.head == 0);
+    assert(ll.tail == 0);
 }
 
 void test_stk_push() {
@@ -160,9 +182,42 @@ void test_stk_pop() {
     assert(stk.head == 0);
 }
 
+void test_q_enqueue() {
+    int err;
+    Queue q = {0,0};
+    q_enqueue(&q, (void*)42, &err);
+    assert(q.head->value = (void*)42);
+    q_enqueue(&q, (void*)24, &err);
+    assert(q.head->value = (void*)24);
+    assert(q.head->children[1]->value = (void*)42);
+}
+
+void test_q_dequeue() {
+    int err;
+    Queue q = {0, 0};
+    q_enqueue(&q, (void*)42, &err);
+    assert(q_dequeue(&q, &err) == (void*)42);
+    assert(q.len == 0);
+    assert(q.head == 0);
+    assert(q.tail == 0);
+    /* assert(q_dequeue(&q, &err) == (void*)-1); */
+}
+
 int main() {
     puts("testing node_new");
     test_node_new();
+    puts("[OK]");
+
+    puts("testing ll_seek");
+    test_ll_seek();
+    puts("[OK]");
+
+    puts("testing ll_insert");
+    test_ll_insert();
+    puts("[OK]");
+
+    puts("testing ll_enqueue");
+    test_ll_enqueue();
     puts("[OK]");
 
     puts("testing ll_append");
@@ -173,16 +228,8 @@ int main() {
     test_ll_remove_last();
     puts("[OK]");
 
-    puts("testing ll_seek");
-    test_ll_seek();
-    puts("[OK]");
-
     puts("testing ll_get");
     test_ll_get();
-    puts("[OK]");
-
-    puts("testing ll_insert");
-    test_ll_insert();
     puts("[OK]");
 
     puts("testing ll_remove_at");
@@ -203,6 +250,14 @@ int main() {
 
     puts("testing stk_pop");
     test_stk_pop();
+    puts("[OK]");
+
+    puts("testing q_enqueue");
+    test_q_enqueue();
+    puts("[OK]");
+
+    puts("testing q_dequeue");
+    test_q_dequeue();
     puts("[OK]");
 
     return 0;

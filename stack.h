@@ -3,9 +3,10 @@
 
 #include "linkedList.h"
 
+/* Stack is a macro equivalent to LinkedList */
 #define Stack LinkedList
 
-int stk_push(Stack*, void*, int*);
+#define stk_push(stack_p, val, err_p) ll_enqueue(stack_p, val, err_p)
 
 void* stk_pop(Stack*, int*);
 #endif
