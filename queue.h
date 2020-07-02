@@ -9,4 +9,6 @@
 
 #define q_dequeue(queue_p, err_p) ll_pop(queue_p, err_p)
 
+#define q_free(queue_p, err_p) ll_free_nodes(queue_p, err_p)
+
 #endif

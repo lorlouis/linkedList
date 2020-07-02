@@ -16,6 +16,8 @@ void* stk_pop(Stack* stk, int* err) {
     void* val = stk->head->value;
     Node* node = stk->head->children[1];
     node_free(stk->head);
+    stk->len--;
     stk->head = node;
+    if(stk->len == 1 || !stk->len) stk->tail = node;
     return val;
 }

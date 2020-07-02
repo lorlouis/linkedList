@@ -11,7 +11,7 @@
 Node* node_new(void* value, unsigned int nb_children, int *err) {
     *err = 0;
     if(nb_children > MAX_NB_CHILDREN){
-        *err = 29;  /* Illegal seek */
+        *err = 75; /* Value too large for defined data type */
         return 0;
     }
     Node *local_node = malloc(sizeof(Node));

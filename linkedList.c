@@ -5,8 +5,6 @@
 #include "node.h"
 #include "linkedList.h"
 
-/* TODO IMPLEMENT TAIL EVERYWHERE AND OPTIMISE FOR IT */
-
 /* returns a pointer to the node,
  * returns 0 if the seek fails
  * and writes an errno to *err */
@@ -104,7 +102,6 @@ int ll_append(LinkedList* ll, void* value, int *err) {
     return 0;
 }
 
-/* TODO rework to use tail instead of head */
 /* removes the last element in the linked list
  * on fail, it returns -1 and sets *err to and errno */
 int ll_remove_last(LinkedList* ll, int* err) {
@@ -138,8 +135,11 @@ int ll_free_nodes(LinkedList *ll, int *err) {
         *err = 29;  /* Illegal seek */
         return -1;
     }
-    /* on error remove_last will set err to Illegal seek */
-    while(ll_remove_last(ll, err) == 0);
+    /* try and remove from ll until it fails */
+    int _err = 0;
+    while(ll_remove_last(ll, &_err) == 0);
+    /* if remove_last failed and len is not 0 set the error */
+    *err = ll->len ? _err : 0;
     return ll->len ? -1 : 0;
 }
 
