@@ -7,9 +7,15 @@
 #include "stack.h"
 #include "queue.h"
 
+#define testing(str, fn) { \
+printf(str);\
+fn();\
+puts("\033[32m[OK]\033[0m");\
+}
+
 /* Node tests */
 void test_node_new() {
-    int err;
+    int err = 0;
     /* test MAX_NB_CHILDREN */
     assert(node_new((void*)42, MAX_NB_CHILDREN +1, &err) == 0);
     assert(err == 75);
@@ -20,12 +26,11 @@ void test_node_new() {
     assert((intptr_t)node->value == 42);
     int i;
     for(i=0;i<2;i++) assert(node->children[i] == 0);
-    /* _node_debug_print(node); */
     node_free(node);
 }
 
 void test_ll_enqueue() {
-    int err;
+    int err = 0;
     /* init linked list */
     LinkedList ll = {0};
     ll_enqueue(&ll, (void*)42, &err);
@@ -286,61 +291,33 @@ void test_q_dequeue() {
 }
 
 int main() {
-    puts("testing node_new");
-    test_node_new();
-    puts("[OK]");
+    testing("testing node_new", test_node_new);
 
-    puts("testing ll_seek");
-    test_ll_seek();
-    puts("[OK]");
+    testing("testing ll_seek", test_ll_seek);
 
-    puts("testing ll_insert");
-    test_ll_insert();
-    puts("[OK]");
+    testing("testing ll_insert", test_ll_insert);
 
-    puts("testing ll_enqueue");
-    test_ll_enqueue();
-    puts("[OK]");
+    testing("testing ll_enqueue", test_ll_enqueue);
 
-    puts("testing ll_append");
-    test_ll_append();
-    puts("[OK]");
+    testing("testing ll_append", test_ll_append);
 
-    puts("testing ll_remove_last");
-    test_ll_remove_last();
-    puts("[OK]");
+    testing("testing ll_remove_last", test_ll_remove_last);
 
-    puts("testing ll_get");
-    test_ll_get();
-    puts("[OK]");
+    testing("testing ll_get", test_ll_get);
 
-    puts("testing ll_remove_at");
-    test_ll_remove_at();
-    puts("[OK]");
+    testing("testing ll_remove_at", test_ll_remove_at);
 
-    puts("testing ll_pop");
-    test_ll_pop();
-    puts("[OK]");
+    testing("testing ll_pop", test_ll_pop);
 
-    puts("testing ll_free_nodes");
-    test_ll_free_nodes();
-    puts("[OK]");
+    testing("testing ll_free_nodes", test_ll_free_nodes);
 
-    puts("testing stk_push");
-    test_stk_push();
-    puts("[OK]");
+    testing("testing stk_push", test_stk_push);
 
-    puts("testing stk_pop");
-    test_stk_pop();
-    puts("[OK]");
+    testing("testing stk_pop", test_stk_pop);
 
-    puts("testing q_enqueue");
-    test_q_enqueue();
-    puts("[OK]");
+    testing("testing q_enqueue", test_q_enqueue);
 
-    puts("testing q_dequeue");
-    test_q_dequeue();
-    puts("[OK]");
+    testing("testing q_dequeue", test_q_dequeue);
 
     return 0;
 }

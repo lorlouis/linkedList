@@ -8,7 +8,7 @@
 /* returns a pointer to the node,
  * returns 0 if the seek fails
  * and writes an errno to *err */
-Node* ll_seek(LinkedList* ll, unsigned int index, int *err) {
+Node* ll_seek(LinkedList* ll, int index, int *err) {
     *err = 0;
     /* out of bound */
     if(index >= ll->len){
@@ -45,7 +45,7 @@ int ll_enqueue(LinkedList *ll, void* value, int *err) {
     return 0;
 }
 
-int ll_insert(LinkedList* ll, unsigned int index, void* value, int *err) {
+int ll_insert(LinkedList* ll, int index, void* value, int *err) {
     *err = 0;
     /* check if we append */
     if(index == ll->len) {
@@ -143,7 +143,7 @@ int ll_free_nodes(LinkedList *ll, int *err) {
     return ll->len ? -1 : 0;
 }
 
-int ll_remove_at(LinkedList* ll, unsigned int index, int *err) {
+int ll_remove_at(LinkedList* ll, int index, int *err) {
     *err = 0;
     if(index >= ll->len){
         *err = 29;  /* Illegal seek */
@@ -181,7 +181,7 @@ int ll_remove_at(LinkedList* ll, unsigned int index, int *err) {
 
 /* returns the value stored at index in the linked list
  * on fail it returns NULL and write an errno to *err */
-void* ll_get(LinkedList* ll, unsigned int index, int* err) {
+void* ll_get(LinkedList* ll, int index, int* err) {
     /* ll_seek sets *err to 0, no use to set it here */
     Node* ll_node = ll_seek(ll, index, err);
     if(*err) return 0;
