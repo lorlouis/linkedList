@@ -7,14 +7,10 @@
 #include "stack.h"
 #include "queue.h"
 
-#define testing(str, fn) { \
-printf(str);\
-fn();\
-puts("\033[32m[OK]\033[0m");\
-}
+#include "tests.h"
 
 /* Node tests */
-void test_node_new() {
+void test_node_new(void) {
     int err = 0;
     /* test MAX_NB_CHILDREN */
     assert(node_new((void*)42, MAX_NB_CHILDREN +1, &err) == 0);
@@ -29,7 +25,7 @@ void test_node_new() {
     node_free(node);
 }
 
-void test_ll_enqueue() {
+void test_ll_enqueue(void) {
     int err = 0;
     /* init linked list */
     LinkedList ll = {0};
@@ -50,7 +46,7 @@ void test_ll_enqueue() {
     assert(err == 0);
 }
 
-void test_ll_append() {
+void test_ll_append(void) {
     int err;
     LinkedList ll = {0};
     /* mallocs a new node on the head */
@@ -74,7 +70,7 @@ void test_ll_append() {
     assert(err == 0);
 }
 
-void test_ll_remove_last() {
+void test_ll_remove_last(void) {
     int err;
     LinkedList ll = {0};
     /* make sure that it fails if ll is empty */
@@ -100,7 +96,7 @@ void test_ll_remove_last() {
     /* _ll_debug_print(&ll); */
 }
 
-void test_ll_free_nodes() {
+void test_ll_free_nodes(void) {
     int err;
     LinkedList ll = {0};
     /* fails on empty linked list */
@@ -116,7 +112,7 @@ void test_ll_free_nodes() {
     assert(ll.tail == 0);
 }
 
-void test_ll_seek() {
+void test_ll_seek(void) {
     int err;
     LinkedList ll = {0};
     assert(ll_seek(&ll, 0, &err) == 0);
@@ -132,7 +128,7 @@ void test_ll_seek() {
     assert(err == 0);
 }
 
-void test_ll_get() {
+void test_ll_get(void) {
     int err;
     LinkedList ll = {0};
     assert(ll_get(&ll, 0, &err) == 0);
@@ -151,7 +147,7 @@ void test_ll_get() {
     assert(err == 0);
 }
 
-void test_ll_insert() {
+void test_ll_insert(void) {
     int err;
     LinkedList ll = {0};
     ll_append(&ll,(void*)12, &err);
@@ -191,7 +187,7 @@ void test_ll_insert() {
     assert(err == 0);
 }
 
-void test_ll_remove_at() {
+void test_ll_remove_at(void) {
     int err;
     LinkedList ll = {0};
     /* fail on index > ll.len */
@@ -214,7 +210,7 @@ void test_ll_remove_at() {
     ll_free_nodes(&ll, &err);
 }
 
-void test_ll_pop() {
+void test_ll_pop(void) {
     int err;
     LinkedList ll = {0};
     ll_append(&ll, (void*)42, &err);
@@ -224,7 +220,7 @@ void test_ll_pop() {
     assert(ll.tail == 0);
 }
 
-void test_stk_push() {
+void test_stk_push(void) {
     int err;
     /* init linked list */
     Stack stk = {0};
@@ -245,7 +241,7 @@ void test_stk_push() {
     assert(err == 0);
 }
 
-void test_stk_pop() {
+void test_stk_pop(void) {
     int err;
     Stack stk = {0};
     stk_push(&stk, (void*)42, &err);
@@ -259,7 +255,7 @@ void test_stk_pop() {
     assert(stk.head == 0);
 }
 
-void test_q_enqueue() {
+void test_q_enqueue(void) {
     int err;
     /* init linked list */
     Queue q = {0};
@@ -280,7 +276,7 @@ void test_q_enqueue() {
     assert(err == 0);
 }
 
-void test_q_dequeue() {
+void test_q_dequeue(void) {
     int err;
     Queue q = {0};
     q_enqueue(&q, (void*)42, &err);
@@ -290,7 +286,7 @@ void test_q_dequeue() {
     assert(q.tail == 0);
 }
 
-int main() {
+int main(void) {
     testing("testing node_new", test_node_new);
 
     testing("testing ll_seek", test_ll_seek);

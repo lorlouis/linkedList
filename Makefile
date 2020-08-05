@@ -1,31 +1,30 @@
-OBJS    = tests.o linkedList.o node.o stack.o
-SOURCE  = tests.c linkedList.c node.c stack.c
+OBJS    = node.o linkedList.o stack.o
+SOURCE  = node.c linkedList.c stack.c
 HEADER  = linkedList.h node.h stack.h queue.h
-OUT = tests
+OUT = liblinkedList.a
 CC  = gcc -g
 LINT =
-FLAGS    = -std=c89 -c -Wall -Wextra
-LFLAGS   =
+FLAGS = -m64 -std=c99 -pedantic -Wall -Wshadow -Wpointer-arith -Wcast-qual -Wstrict-prototypes -Wmissing-prototypes
+LFLAGS =
 
 debug: $(OBJS)
-	$(CC) $(OBJS) -o $(OUT) $(LFLAGS)
+	ar rcs $(OUT) $(OBJS)
+	$(CC) tests.c -o tests $(FLAGS) -L. -llinkedList
 
 rel: $(OBJS)
-	$(CC) -O3 $(OBJS) -o $(OUT) $(LFLAGS)
+	ar rcs $(OUT) $(OBJS)
+	mkdir -p lib
+	cp $(OUT) lib/
+	mkdir -p include
+	mkdir -p include/ll
+	cp $(HEADER) include/ll/
 
 %.o: %.c
-	$(CC) $(FLAGS) $< -o $@
-
-install: linkedList.o
-	cp linkedList.o /usr/local/lib/
-	cp linkedList.h /usr/local/include/
-
-uninstall:
-	rm /usr/local/lib/linkedList.o
-	rm /usr/local/include/linkedList.h
+	$(CC) -c $(FLAGS) $< -o $@
 
 clean:
-	rm -f $(OBJS) $(OUT)
+	rm -f $(OBJS) $(OUT) tests
+	rm -rf lib/ include/
 
 valgrind: $(OUT)
 	valgrind $(OUT)

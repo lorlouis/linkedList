@@ -2,4 +2,11 @@
 A simple doubly linked list implementation
 
 ## How to use
-Just copy the content of this repo in your project
+Just run: `make rel`
+
+You should find 2 directories named `include` and `lib`
+Just copy them to your project
+
+you can include the headers with `#include "./include/ll/a_header.h"`
+
+you need to add `-L./lib/ -llinkedList` to gcc to link the lib.
